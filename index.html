@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Halcyon</title>
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" />
+    <link
+      rel="gettext"
+      type="text/x-gettext-translation"
+      href="/locale/en_US/LC_MESSAGES/messages.po"
+    />
+    <link rel="stylesheet" href="style.css" media="all" />
+    <script>
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches)
+        document.write(
+          '<link rel="stylesheet" href="/assets/css/dark.css" media="all">'
+        );
+    </script>
+    <link rel="stylesheet" href="fontawesome.min.css" media="all" />
+    <link rel="stylesheet" href="emojipicker.css" media="all" />
+    <script src="jquery.min.js"></script>
+    <script src="https://underscorejs.org/underscore-min.js"></script>
+    <script src="posts/store.js"></script>
+    <script src="halcyonFunctions.js"></script>
+    <script src="mastodon.js"></script>
+    <!-- thx @kirschn -->
+    <script src="jquery.cookie.js"></script>
+    <script src="autosize.js"></script>
+    <script src="textarea.js"></script>
+    <script src="shortcut.js"></script>
+    <script src="replace_emoji.js"></script>
+    <script src="emojidata.js"></script>
+    <script src="emojipicker.js"></script>
+    <script src="halcyonTemplates.js"></script>
+    <script src="halcyonUI.js"></script>
+    <script src="search.js"></script>
+    <script src="pomo.js"></script>
+    <script src="twemoji.min.js"></script>
+    <script src="clipboard.min.js"></script>
+    <script src="soundmanager.js"></script>
+    <script src="audio.js"></script>
+    <script>
+      if (
+        !localStorage.getItem("current_id") |
+        !localStorage.getItem("current_instance") |
+        !localStorage.getItem("current_authtoken")
+      ) {
+        var __ = (function(){return function(){}})();
+        refreshApp();//location.href = "/login";
+      } else {
+        Pomo.domain = "messages";
+        Pomo.returnStrings = true;
+        Pomo.unescapeStrings = true;
+        var pomo_def = Pomo.load(null, {
+          format: "po",
+          mode: "link",
+          translation_domain: "messages"
+        });
+        var ___ = (function() {
+          var _ = !!window.Pomo
+            ? window.Pomo
+            : !!window.__Pomo
+            ? window.__Pomo
+            : false;
+          var gettext_wrap = function(word, options) {
+            return _.getText(word, options);
+          };
+          gettext_wrap = !!_ ? gettext_wrap : false;
+          if (!gettext_wrap) {
+            throw new "Pomo can't be found"();
+          }
+          return gettext_wrap;
+        })();
+        if ($.cookie("session") === "true") {
+          refreshApp();
+        } else if ($.cookie("session") === undefined) {
+          resetApp();
+        }
+      }
+      server_setting_youplay = true;
+      server_setting_vimeo = true;
+    </script>
+  </head>
+  <body>
+    <header id="header">
+      <div class="header_nav_wrap">
+        <nav class="header_left_box">
+          <ul class="header_nav_list">
+            <li id="header_nav_item_home" class="header_nav_item">
+              <a href="/" id="home_nav">
+                <i class="fa fa-fw fa-home"></i>
+                <span>Home</span>
+              </a>
+              <div class="home_badge nav_badge invisible"></div>
+            </li>
+            <li id="header_nav_item_local" class="header_nav_item local_nav">
+              <a href="/local" id="local_nav">
+                <i class="fa fa-fw fa-users"></i>
+                <span>Local</span>
+              </a>
+              <div class="local_badge nav_badge invisible"></div>
+            </li>
+            <li
+              id="header_nav_item_federated"
+              class="header_nav_item federated_nav"
+            >
+              <a href="/federated" id="federated_nav">
+                <i class="fa fa-fw fa-globe"></i>
+                <span>Federated</span>
+              </a>
+              <div class="federated_badge nav_badge invisible"></div>
+            </li>
+            <li
+              id="header_nav_item_notifications"
+              class="header_nav_item notifications_nav"
+            >
+              <a href="/notifications" id="notifications_nav">
+                <i class="fa fa-fw fa-bell"></i>
+                <span>Notifications</span>
+              </a>
+              <div class="notification_badge nav_badge invisible"></div>
+            </li>
+            <li id="header_nav_item_lists" class="header_nav_item lists_nav">
+              <a href="/lists" id="lists_nav">
+                <i class="fa fa-fw fa-list"></i>
+                <span>Lists</span>
+              </a>
+              <div class="lists_badge nav_badge invisible"></div>
+            </li>
+          </ul>
+        </nav>
+        <nav class="header_right_box">
+          <ul class="header_nav_list">
+            <li class="header_nav_item search_form_wrap">
+              <form class="search_form" action="/search" method="GET">
+                <input
+                  id="search_form"
+                  class="search_form_input"
+                  placeholder="Search Mastodon"
+                  type="text"
+                  name="q"
+                  accesskey="/"
+                />
+                <span class="search_form_submit">
+                  <button type="submit">
+                    <i class="fa fa-fw fa-search"></i>
+                  </button>
+                </span>
+              </form>
+              <nav class="header_search_suggestions invisible"></nav>
+            </li>
+            <li class="header_nav_item my_account_wrap">
+              <button class="header_account_avatar">
+                <div class="my_account">
+                  <img class="js_current_profile_image" />
+                </div>
+              </button>
+              <nav class="header_my_account_nav invisible">
+                <ul>
+                  <li>
+                    <a class="js_current_profile_link emoji_poss">
+                      <span
+                        class="js_current_profile_displayname display_name"
+                      ></span>
+                      <span>View profile</span>
+                    </a>
+                  </li>
+                </ul>
+                <ul>
+                  <li>
+                    <a href="/direct">Direct</a>
+                  </li>
+                  <li>
+                    <a href="/settings">Settings</a>
+                  </li>
+                  <li>
+                    <a href="/logout">Log out</a>
+                  </li>
+                </ul>
+              </nav>
+            </li>
+            <li class="header_nav_item toot_button_wrap">
+              <button id="creat_status" class="toot_button" accesskey="n">
+                <div class="toot_button_label">
+                  <i class="fa fa-fw fa-pencil-square-o"></i>
+                  <span>Toot</span>
+                </div>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main id="main" class="home">
+      <div class="article_wrap">
+        <aside class="left_column">
+          <div class="current_profile_box">
+            <div class="current_profile_header">
+              <img class="js_current_header_image" />
+            </div>
+            <div class="current_profile">
+              <div class="current_profile_icon">
+                <img class="js_current_profile_image" />
+              </div>
+              <div class="current_profile_name_box">
+                <a class="js_current_profile_link">
+                  <h2 class="js_current_profile_displayname emoji_poss"></h2>
+                  <span class="js_current_profile_username"></span>
+                </a>
+              </div>
+              <ul class="current_profile_counts">
+                <li class="current_profile_count current_profile_toots_count">
+                  <a class="current_toots_count_link">
+                    <span class="title">TOOTS</span>
+                    <span class="js_current_toots_count count"></span>
+                  </a>
+                </li>
+                <li class="current_profile_count current_profile_follows_count">
+                  <a class="current_following_count_link">
+                    <span class="title">FOLLOWING</span>
+                    <span class="js_current_following_count count"></span>
+                  </a>
+                </li>
+                <li
+                  class="current_profile_count current_profile_followers_count"
+                >
+                  <a class="current_followers_count_link">
+                    <span class="title">FOLLOWERS</span>
+                    <span class="js_current_followers_count count"></span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+        <article class="center_column">
+          <header class="timeline_header">
+            <form
+              id="header_status_form"
+              name="header_status_form"
+              class="status_form ready"
+            >
+              <div class="status_left icon_box">
+                <img class="js_current_profile_image" />
+              </div>
+              <div class="status_top">
+                <input
+                  class="status_spoiler invisible"
+                  name="status_spoiler"
+                  placeholder="Content warning"
+                  data-random="43884"
+                  type="text"
+                />
+              </div>
+              <div class="status_main">
+                <div class="status_textarea">
+                  <textarea
+                    class="emoji_poss"
+                    name="status_textarea"
+                    placeholder="What's happening?"
+                    data-random="14839"
+                  ></textarea>
+                  <div class="media_attachments_preview_area invisible"></div>
+                  <div class="status_poll_editor invisible">
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <div
+                      style="height:32px;display:inline-block;padding-top:10px"
+                    >
+                      Expires in
+                    </div>
+                    <div style="float:right;margin-right:5px">
+                      <div class="poll_time">
+                        <input
+                          type="number"
+                          min="0"
+                          max="7"
+                          placeholder="0-7"
+                          class="poll_days"
+                        />Days
+                      </div>
+                      <div class="poll_time">
+                        <input
+                          type="number"
+                          min="0"
+                          max="24"
+                          placeholder="0-24"
+                          class="poll_hours"
+                        />Hours
+                      </div>
+                      <div class="poll_time">
+                        <input
+                          type="number"
+                          min="0"
+                          max="60"
+                          placeholder="0-60"
+                          class="poll_mins"
+                        />Minutes
+                      </div>
+                    </div>
+                    <br />
+                    <div class="switch poll_mc_switch">
+                      <input type="checkbox" class="poll_multiple_choice" />
+                      <div class="switch-btn">
+                        <span></span>
+                      </div>
+                    </div>
+                    Multiple choice
+                  </div>
+                </div>
+              </div>
+              <div class="status_bottom invisible">
+                <label
+                  for="header_status_media_atta"
+                  class="status_media_attachment status_option_button"
+                >
+                  <i class="fa fa-camera" aria-hidden="true"></i>
+                </label>
+                <label
+                  for="header_status_cw"
+                  class="status_CW status_option_button"
+                >
+                  <span class="disallow_select">CW</span>
+                </label>
+                <label
+                  for="header_status_nsfw"
+                  class="status_NSFW status_option_button"
+                >
+                  <span class="disallow_select">NSFW</span>
+                </label>
+                <div
+                  class="status_privacy status_option_button expand_privacy_menu_button"
+                >
+                  <i class="fa fa-globe" aria-hidden="true"></i>
+                  <div class="expand_privacy_menu invisible">
+                    <label
+                      for="header_status_public"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-globe"
+                    >
+                      <i class="fa fa-globe" aria-hidden="true"></i>Public
+                    </label>
+                    <label
+                      for="header_status_unlisted"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-unlock-alt"
+                    >
+                      <i class="fa fa-unlock-alt" aria-hidden="true"></i
+                      >Unlisted
+                    </label>
+                    <label
+                      for="header_status_fonly"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-lock"
+                    >
+                      <i class="fa fa-lock" aria-hidden="true"></i
+                      >Followers-only
+                    </label>
+                    <label
+                      for="header_status_direct"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-envelope"
+                    >
+                      <i class="fa fa-envelope" aria-hidden="true"></i>Direct
+                    </label>
+                  </div>
+                </div>
+                <label
+                  for="header_status_poll"
+                  class="status_poll status_option_button"
+                >
+                  <i class="fa fa-pie-chart" aria-hidden="true"></i>
+                </label>
+                <label
+                  for="header_status_emoji"
+                  class="status_emoji status_option_button"
+                >
+                  <i class="fa fa-smile-o" aria-hidden="true"></i>
+                </label>
+                <input
+                  id="header_status_media_atta"
+                  name="files"
+                  type="file"
+                  multiple
+                  class="invisible"
+                />
+                <input
+                  id="header_status_cw"
+                  name="status_cw"
+                  type="checkbox"
+                  class="invisible"
+                />
+                <input
+                  id="header_status_nsfw"
+                  name="status_nsfw"
+                  type="checkbox"
+                  class="invisible"
+                />
+                <input
+                  id="header_status_public"
+                  name="privacy_option"
+                  value="public"
+                  class="invisible"
+                  type="radio"
+                />
+                <input
+                  id="header_status_unlisted"
+                  name="privacy_option"
+                  value="unlisted"
+                  class="invisible"
+                  type="radio"
+                />
+                <input
+                  id="header_status_fonly"
+                  name="privacy_option"
+                  value="private"
+                  class="invisible"
+                  type="radio"
+                />
+                <input
+                  id="header_status_direct"
+                  name="privacy_option"
+                  value="direct"
+                  class="invisible"
+                  type="radio"
+                />
+                <div
+                  id="header_status_emoji"
+                  name="status_emoji"
+                  type="button"
+                ></div>
+                <div class="submit_status_label_wrap">
+                  <span class="character_count"> </span>
+                  <label
+                    for="header_status_addfield"
+                    class="status_addfield status_option_button"
+                  >
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                  </label>
+                  <label
+                    for="header_status_form_submit"
+                    class="submit_status_label"
+                  >
+                    <div class="toot_button_label disallow_select">
+                      <i class="fa fa-fw fa-pencil-square-o"></i>
+                      <span>Toot</span>
+                    </div>
+                  </label>
+                </div>
+                <input
+                  id="header_status_form_submit"
+                  class="submit_status"
+                  type="button"
+                  class="invisible"
+                />
+              </div>
+            </form>
+          </header>
+          <div id="js-stream_update">
+            <button>View <span></span> new Toots</button>
+          </div>
+          <ul id="js-timeline" class="timeline"></ul>
+          <footer id="js-timeline_footer" class="timeline_footer">
+            <i class="fa fa-spin fa-circle-o-notch" aria-hidden="true"></i>
+          </footer>
+        </article>
+        <aside class="right_column">
+          <section class="side_widgets_wrap">
+            <span id="who-to-follow-provider" style="display:none"
+              >https://vinayaka.distsn.org/cgi-bin/vinayaka-user-match-osa-api.cgi?{{
+                host
+              }}+{{ user }}</span
+            >
+            <div class="side_widget follow_opt_in side_widgets_footer">
+              <h2>Who to follow</h2>
+              Halcyon needs to connect to an external server to get a list of
+              users which have similar interests as you. If you want to use this
+              feature, please opt-in.
+              <center>
+                <br />
+                <button class="halcyon_button" id="enable_follow">
+                  <span>Enable who to follow</span>
+                </button>
+              </center>
+            </div>
+            <div
+              class="side_widget follow_loading"
+              style="display:none;color:#AAB8C2"
+            >
+              <h2>Who to follow</h2>
+              <div style="height:100px"></div>
+              <center>
+                <span class="fa-stack fa-2x">
+                  <i class="fa fa-circle-o-notch fa-spin" id="follow_icon"></i>
+                </span>
+              </center>
+              <div style="height:100px"></div>
+            </div>
+            <div
+              class="side_widget with_button what_to_follow"
+              style="display:none"
+            >
+              <div class="form_title">
+                <h2>Who to follow</h2>
+                <a href="/whotofollow" class="headerbtn">MORE</a>
+              </div>
+              <ul class="account_list">
+                <li class="account_box what_to_follow_0">
+                  <div class="icon_box">
+                    <img src="" />
+                  </div>
+                  <div class="label_box">
+                    <a href="">
+                      <h3>
+                        <span class="dn"></span>
+                        <span class="un"></span>
+                      </h3>
+                    </a>
+                    <button class="follow_button" mid="" data="">
+                      <i class="fa fa-fw fa-user-plus"></i>
+                      <span>Follow</span>
+                    </button>
+                  </div>
+                </li>
+                <li class="account_box what_to_follow_1">
+                  <div class="icon_box">
+                    <img src="" />
+                  </div>
+                  <div class="label_box">
+                    <a href="">
+                      <h3>
+                        <span class="dn"></span>
+                        <span class="un"></span>
+                      </h3>
+                    </a>
+                    <button class="follow_button" mid="" data="">
+                      <i class="fa fa-fw fa-user-plus"></i>
+                      <span>Follow</span>
+                    </button>
+                  </div>
+                </li>
+                <li class="account_box what_to_follow_2">
+                  <div class="icon_box">
+                    <img src="" />
+                  </div>
+                  <div class="label_box">
+                    <a href="">
+                      <h3>
+                        <span class="dn"></span>
+                        <span class="un"></span>
+                      </h3>
+                    </a>
+                    <button class="follow_button" mid="" data="">
+                      <i class="fa fa-fw fa-user-plus"></i>
+                      <span>Follow</span>
+                    </button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+          <footer class="side_widgets_footer side_widget">
+            <ul>
+              <li>
+                Halcyon for
+                <a href="https://github.com/tootsuite/mastodon">Mastodon</a> and
+                <a href="https://git.pleroma.social/pleroma/pleroma">Pleroma</a>
+              </li>
+              <li><a href="/instance">About</a></li>
+              <li><a class="footer_widget_terms">Terms</a></li>
+              <li>
+                <a
+                  href="https://github.com/tootsuite/documentation/blob/master/Using-Mastodon/Apps.md"
+                  >Apps</a
+                >
+              </li>
+              <li>
+                <a href="https://notabug.org/halcyon-suite/halcyon"
+                  >Source code</a
+                >
+              </li>
+              <li><a href="https://instances.social">Other instances</a></li>
+              <li><a href="/privacy">Privacy policy</a></li>
+              <li><a href="/imprint">Imprint</a></li>
+              <li>
+                <a href="https://liberapay.com/GGC-PROJECT/donate"
+                  >Spenden via Liberapay</a
+                >
+              </li>
+              <li>Version 2.3.3</li>
+            </ul>
+          </footer>
+          <img
+            style="display:block;margin:16px auto;width: 30%;opacity: .3;"
+            src="/assets/images/halcyon.png"
+          />
+        </aside>
+      </div>
+    </main>
+    <script>
+      current_file = location.pathname;
+      setTimeline("timelines/home");
+      $("#home_nav").addClass("view");
+      $("title").text("Halcyon");
+    </script>
+    <footer id="footer"></footer>
+    <div id="overlay_message">
+      <section>
+        <span></span>
+      </section>
+    </div>
+    <div id="js-overlay_content_wrap">
+      <div id="js-overlay_content">
+        <div class="temporary_object"></div>
+        <div class="parmanent_object">
+          <div class="overlay_status invisible">
+            <header class="overlay_status_header">
+              <span>Compose new Toot</span>
+            </header>
+            <form
+              id="overlay_status_form"
+              name="overlay_status_form"
+              class="status_form ready"
+            >
+              <div class="status_top">
+                <input
+                  class="status_spoiler invisible"
+                  name="status_spoiler"
+                  placeholder="Content warning"
+                  data-random="35366"
+                  type="text"
+                />
+              </div>
+              <div class="status_main">
+                <div class="status_textarea">
+                  <textarea
+                    class="emoji_poss"
+                    name="status_textarea"
+                    placeholder="What's happening?"
+                    data-random="30210"
+                  ></textarea>
+                  <div class="media_attachments_preview_area invisible"></div>
+                  <div class="status_poll_editor invisible">
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <div
+                      style="height:32px;display:inline-block;padding-top:10px"
+                    >
+                      Expires in
+                    </div>
+                    <div style="float:right;margin-right:5px">
+                      <div class="poll_time">
+                        <input
+                          type="number"
+                          min="0"
+                          max="7"
+                          placeholder="0-7"
+                          class="poll_days"
+                        />Days
+                      </div>
+                      <div class="poll_time">
+                        <input
+                          type="number"
+                          min="0"
+                          max="24"
+                          placeholder="0-24"
+                          class="poll_hours"
+                        />Hours
+                      </div>
+                      <div class="poll_time">
+                        <input
+                          type="number"
+                          min="0"
+                          max="60"
+                          placeholder="0-60"
+                          class="poll_mins"
+                        />Minutes
+                      </div>
+                    </div>
+                    <br />
+                    <div class="switch poll_mc_switch">
+                      <input type="checkbox" class="poll_multiple_choice" />
+                      <div class="switch-btn">
+                        <span></span>
+                      </div>
+                    </div>
+                    Multiple choice
+                  </div>
+                </div>
+              </div>
+              <div class="status_bottom">
+                <label
+                  for="overlay_status_media_atta"
+                  class="status_media_attachment status_option_button"
+                >
+                  <i class="fa fa-camera" aria-hidden="true"></i>
+                </label>
+                <label
+                  for="overlay_status_cw"
+                  class="status_CW status_option_button"
+                >
+                  <span class="disallow_select">CW</span>
+                </label>
+                <label
+                  for="overlay_status_nsfw"
+                  class="status_NSFW status_option_button"
+                >
+                  <span class="disallow_select">NSFW</span>
+                </label>
+                <div
+                  class="status_privacy status_option_button expand_privacy_menu_button"
+                >
+                  <i class="fa fa-globe" aria-hidden="true"></i>
+                  <div class="expand_privacy_menu invisible">
+                    <label
+                      for="overlay_status_public"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-globe"
+                    >
+                      <i class="fa fa-globe" aria-hidden="true"></i
+                      >Public</label
+                    >
+                    <label
+                      for="overlay_status_unlisted"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-unlock-alt"
+                    >
+                      <i class="fa fa-unlock-alt" aria-hidden="true"></i
+                      >Unlisted</label
+                    >
+                    <label
+                      for="overlay_status_fonly"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-lock"
+                    >
+                      <i class="fa fa-lock" aria-hidden="true"></i
+                      >Followers-only</label
+                    >
+                    <label
+                      for="overlay_status_direct"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-envelope"
+                    >
+                      <i class="fa fa-envelope" aria-hidden="true"></i
+                      >Direct</label
+                    >
+                  </div>
+                </div>
+                <label
+                  for="overlay_status_poll"
+                  class="status_poll status_option_button"
+                >
+                  <i class="fa fa-pie-chart" aria-hidden="true"></i>
+                </label>
+                <label
+                  for="overlay_status_emoji"
+                  class="status_emoji status_option_button"
+                >
+                  <i class="fa fa-smile-o" aria-hidden="true"></i>
+                </label>
+                <input
+                  id="overlay_status_media_atta"
+                  name="files"
+                  type="file"
+                  multiple
+                  class="invisible"
+                />
+                <input
+                  id="overlay_status_cw"
+                  name="status_cw"
+                  type="checkbox"
+                  class="invisible"
+                />
+                <input
+                  id="overlay_status_nsfw"
+                  name="status_nsfw"
+                  type="checkbox"
+                  class="invisible"
+                />
+                <input
+                  id="overlay_status_public"
+                  name="privacy_option"
+                  value="public"
+                  class="invisible"
+                  type="radio"
+                />
+                <input
+                  id="overlay_status_unlisted"
+                  name="privacy_option"
+                  value="unlisted"
+                  class="invisible"
+                  type="radio"
+                />
+                <input
+                  id="overlay_status_fonly"
+                  name="privacy_option"
+                  value="private"
+                  class="invisible"
+                  type="radio"
+                />
+                <input
+                  id="overlay_status_direct"
+                  name="privacy_option"
+                  value="direct"
+                  class="invisible"
+                  type="radio"
+                />
+                <div
+                  id="overlay_status_emoji"
+                  name="status_emoji"
+                  type="button"
+                ></div>
+                <div class="submit_status_label_wrap">
+                  <span class="character_count"> </span>
+                  <label
+                    for="header_status_addfield"
+                    class="status_addfield status_option_button"
+                  >
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                  </label>
+                  <label
+                    for="overlay_status_form_submit"
+                    class="submit_status_label"
+                  >
+                    <div class="toot_button_label disallow_select">
+                      <i class="fa fa-fw fa-pencil-square-o"></i>
+                      <span>Toot</span>
+                    </div>
+                  </label>
+                </div>
+                <input
+                  id="overlay_status_form_submit"
+                  class="submit_status"
+                  type="button"
+                  class="invisible"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="single_reply_status invisible">
+            <header class="single_reply_status_header">
+              <span>Reply to </span>
+            </header>
+            <div class="status_preview"></div>
+            <form
+              id="single_reply_status_form"
+              name="single_reply_status_form"
+              class="status_form"
+            >
+              <div class="status_top">
+                <input
+                  class="status_spoiler invisible"
+                  name="status_spoiler"
+                  placeholder="Content warning"
+                  data-random="94785"
+                  type="text"
+                />
+              </div>
+              <div class="status_main">
+                <div class="status_textarea">
+                  <textarea
+                    class="emoji_poss"
+                    name="status_textarea"
+                    placeholder="What's happening?"
+                    data-random="39303"
+                  ></textarea>
+                  <div class="media_attachments_preview_area invisible"></div>
+                  <div class="status_poll_editor invisible">
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <i class="fa fa-circle-o"></i>
+                    <input
+                      name="options[]"
+                      type="text"
+                      class="disallow_enter textfield poll_field"
+                      maxlength="25"
+                    /><br />
+                    <div
+                      style="height:32px;display:inline-block;padding-top:10px"
+                    >
+                      Expires in
+                    </div>
+                    <div style="float:right;margin-right:5px">
+                      <div class="poll_time">
+                        <input
+                          type="number"
+                          min="0"
+                          max="7"
+                          placeholder="0-7"
+                          class="poll_days"
+                        />Days
+                      </div>
+                      <div class="poll_time">
+                        <input
+                          type="number"
+                          min="0"
+                          max="24"
+                          placeholder="0-24"
+                          class="poll_hours"
+                        />Hours
+                      </div>
+                      <div class="poll_time">
+                        <input
+                          type="number"
+                          min="0"
+                          max="60"
+                          placeholder="0-60"
+                          class="poll_mins"
+                        />Minutes
+                      </div>
+                    </div>
+                    <br />
+                    <div class="switch poll_mc_switch">
+                      <input type="checkbox" class="poll_multiple_choice" />
+                      <div class="switch-btn">
+                        <span></span>
+                      </div>
+                    </div>
+                    Multiple choice
+                  </div>
+                </div>
+              </div>
+              <div class="status_bottom">
+                <label
+                  for="single_reply_status_media_atta"
+                  class="status_media_attachment status_option_button"
+                >
+                  <i class="fa fa-camera" aria-hidden="true"></i>
+                </label>
+                <label
+                  for="single_reply_status_cw"
+                  class="status_CW status_option_button"
+                >
+                  <span class="disallow_select">CW</span>
+                </label>
+                <label
+                  for="single_reply_status_nsfw"
+                  class="status_NSFW status_option_button"
+                >
+                  <span class="disallow_select">NSFW</span>
+                </label>
+                <div
+                  class="status_privacy status_option_button expand_privacy_menu_button"
+                >
+                  <i class="fa fa-globe" aria-hidden="true"></i>
+                  <div class="expand_privacy_menu invisible">
+                    <label
+                      for="single_reply_status_public"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-globe"
+                    >
+                      <i class="fa fa-globe" aria-hidden="true"></i
+                      >Public</label
+                    >
+                    <label
+                      for="single_reply_status_unlisted"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-unlock-alt"
+                    >
+                      <i class="fa fa-unlock-alt" aria-hidden="true"></i
+                      >Unlisted</label
+                    >
+                    <label
+                      for="single_reply_status_fonly"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-lock"
+                    >
+                      <i class="fa fa-lock" aria-hidden="true"></i
+                      >Followers-only</label
+                    >
+                    <label
+                      for="single_reply_status_direct"
+                      class="status_privacy select_privacy disallow_select"
+                      privacyicon="fa fa-envelope"
+                    >
+                      <i class="fa fa-envelope" aria-hidden="true"></i
+                      >Direct</label
+                    >
+                  </div>
+                </div>
+                <label
+                  for="single_reply_status_poll"
+                  class="status_poll status_option_button"
+                >
+                  <i class="fa fa-pie-chart" aria-hidden="true"></i>
+                </label>
+                <label
+                  for="single_reply_status_emoji"
+                  class="status_emoji status_option_button"
+                >
+                  <i class="fa fa-smile-o" aria-hidden="true"></i>
+                </label>
+                <input
+                  id="single_reply_status_media_atta"
+                  name="files"
+                  type="file"
+                  multiple
+                  class="invisible"
+                />
+                <input
+                  id="single_reply_status_cw"
+                  name="status_cw"
+                  type="checkbox"
+                  class="invisible"
+                />
+                <input
+                  id="single_reply_status_nsfw"
+                  name="status_nsfw"
+                  type="checkbox"
+                  class="invisible"
+                />
+                <input
+                  id="single_reply_status_public"
+                  name="privacy_option"
+                  value="public"
+                  class="invisible"
+                  type="radio"
+                />
+                <input
+                  id="single_reply_status_unlisted"
+                  name="privacy_option"
+                  value="unlisted"
+                  class="invisible"
+                  type="radio"
+                />
+                <input
+                  id="single_reply_status_fonly"
+                  name="privacy_option"
+                  value="private"
+                  class="invisible"
+                  type="radio"
+                />
+                <input
+                  id="single_reply_status_direct"
+                  name="privacy_option"
+                  value="direct"
+                  class="invisible"
+                  type="radio"
+                />
+                <div
+                  id="single_reply_status_emoji"
+                  name="status_emoji"
+                  type="button"
+                ></div>
+                <div class="submit_status_label_wrap">
+                  <span class="character_count"> </span>
+                  <label
+                    for="header_status_addfield"
+                    class="status_addfield status_option_button"
+                  >
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                  </label>
+                  <label
+                    for="single_reply_status_form_submit"
+                    class="submit_status_label"
+                  >
+                    <div class="toot_button_label disallow_select">
+                      <i class="fa fa-reply" aria-hidden="true"></i>
+                      <span>Reply</span>
+                    </div>
+                  </label>
+                </div>
+                <input
+                  id="single_reply_status_form_submit"
+                  class="submit_status"
+                  type="button"
+                  class="invisible"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="report_status invisible">
+            <header class="report_status_header">
+              <span>Report a Toot of </span>
+            </header>
+            <div class="status_preview"></div>
+            <form
+              id="report_status_form"
+              name="report_status_form"
+              class="status_form"
+            >
+              <div class="status_main">
+                <div class="status_textarea">
+                  <textarea
+                    name="status_textarea"
+                    placeholder="Please describe what the problem with the Toot is."
+                  ></textarea>
+                </div>
+              </div>
+              <div class="status_bottom">
+                <div class="submit_status_label_wrap">
+                  <span class="character_count"> </span>
+                  <label
+                    for="report_status_form_submit"
+                    class="submit_status_label"
+                  >
+                    <div class="toot_button_label disallow_select">
+                      <i
+                        class="fa fa-exclamation-triangle"
+                        aria-hidden="true"
+                      ></i>
+                      <span>Report</span>
+                    </div>
+                  </label>
+                </div>
+                <input
+                  id="report_status_form_submit"
+                  class="submit_status"
+                  type="button"
+                  class="invisible"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="caption_status invisible">
+            <header class="caption_status_header">
+              <span>Add a caption to the media file</span>
+            </header>
+            <form
+              id="caption_status_form"
+              name="caption_status_form"
+              class="status_form"
+            >
+              <div class="status_main">
+                <div class="status_textarea">
+                  <textarea
+                    name="status_textarea"
+                    placeholder="Please describe what you can see in the picture."
+                  ></textarea>
+                </div>
+              </div>
+              <div class="status_bottom">
+                <div class="submit_status_label_wrap">
+                  <span class="character_count"> </span>
+                  <label
+                    for="caption_status_form_submit"
+                    class="submit_status_label"
+                  >
+                    <div class="toot_button_label disallow_select">
+                      <i class="fa fa-check" aria-hidden="true"></i>
+                      <span>Save</span>
+                    </div>
+                  </label>
+                </div>
+                <input
+                  id="caption_status_form_submit"
+                  class="submit_status"
+                  type="button"
+                  class="invisible"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="overlay_simple overlay_copy_link invisible">
+            <header class="overlay_simple_header">
+              <span class="emoji_poss">Copy link to Toot</span>
+            </header>
+            <div class="overlay_simple_body">
+              <input class="copy_link_input" type="text" value="" readonly />
+            </div>
+          </div>
+          <div class="overlay_simple overlay_confirm invisible">
+            <header class="overlay_simple_header">
+              <span class="emoji_poss">Confirmation</span>
+            </header>
+            <div class="overlay_simple_body">
+              <div
+                class="overlay_confirm_text"
+                style="margin-bottom:10px"
+              ></div>
+              <div class="overlay_simple_controls">
+                <button
+                  class="overlay_confirm_yes toot_button"
+                  style="float:right"
+                >
+                  <div class="toot_button_label">
+                    <i class="fa fa-fw fa-check"></i><span>Yes</span>
+                  </div>
+                </button>
+                <a
+                  href="javascript:$('.close_button').click();void(0)"
+                  class="overlay_confirm_cancel halcyon_link"
+                  style="float:right;margin-top:5px;margin-right:10px"
+                  ><i class="fa fa-times"></i> Cancel</a
+                >
+              </div>
+            </div>
+          </div>
+          <div class="overlay_simple overlay_prompt invisible">
+            <header class="overlay_simple_header">
+              <span class="emoji_poss">Prompt</span>
+            </header>
+            <div class="overlay_simple_body">
+              <div class="overlay_prompt_text" style="margin-bottom:10px"></div>
+              <div style="margin-bottom:10px">
+                <input
+                  type="text"
+                  class="overlay_prompt_input textfield"
+                  style="margin:0;width:100%"
+                />
+              </div>
+              <div class="overlay_simple_controls">
+                <button
+                  class="overlay_prompt_yes toot_button"
+                  style="float:right"
+                >
+                  <div class="toot_button_label">
+                    <i class="fa fa-fw fa-check"></i><span>Ok</span>
+                  </div>
+                </button>
+                <a
+                  href="javascript:$('.close_button').click();void(0)"
+                  class="overlay_prompt_cancel halcyon_link"
+                  style="float:right;margin-top:5px;margin-right:10px"
+                  ><i class="fa fa-times"></i> Cancel</a
+                >
+              </div>
+            </div>
+          </div>
+          <div class="overlay_simple overlay_addlist invisible">
+            <header class="overlay_simple_header">
+              <span class="emoji_poss">Add to list</span>
+            </header>
+            <div class="overlay_simple_body overlay_addlist_body"></div>
+          </div>
+        </div>
+        <button class="close_button">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+    <script>
+      badges_update();
+      $(".footer_widget_terms").attr(
+        "href",
+        "https://" + current_instance + "/terms"
+      );
+    </script>
+  </body>
+</html>
