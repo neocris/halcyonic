@@ -53,11 +53,18 @@ var StoreAPI = function (config) {
         }
         return _.isMatch(_.keys(stproto),_.keys(s)); //needs to order s first eventually due to isMatch shortcommings
     }
-    var sync = function(d){
-        localStorage.halcyon = parse(d);
+    var sync = function(j){
+        localStorage.halcyon = parse(j);
     }
     var parse = function(d){
         return JSON.stringify(d);
+    }
+    var ret = function(k){
+        d = jdata.filter(function(s){
+            return (s.id == k)
+        }).shift();
+        //return _.without(jdata,d);
+        return jdata.indexOf(d);
     }
     var load = function(){
         if(localStorage.halcyon)
@@ -78,11 +85,16 @@ var StoreAPI = function (config) {
                 console.log(e);
             }   
         },
-        del: function(i){
-            jdata.splice(i,1);
+        del: function(k){
+            jdata.splice(ret(k),1);
+            sync(jdata);
+            //jdata = rem(k);
         },
-        perma: function(d){
-            sync(d);
-        }
+        perma: function(t){
+            sync(t);
+        },
+        // use browser sandbox or nodejs app for local use
+        export: function(){},
+        import: function(){}
     }
 }

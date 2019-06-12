@@ -690,7 +690,8 @@ function refreshApp() {
   });
   store_api = new StoreAPI(); //needs auth token
   current_display_name = localStorage.getItem("current_display_name");
-  current_acct = localStorage.getItem("current_acct");
+  //current_acct = localStorage.getItem("current_acct");
+  current_acct = "botdroid";
   current_url = localStorage.getItem("current_url");
   current_header = localStorage.getItem("current_header");
   current_avatar = localStorage.getItem("current_avatar");

@@ -176,6 +176,9 @@ $(function() {
     );
     $(".overlay_confirm_yes").click(function() {
       $(".close_button").click();
+      store_api.del(sid);
+      $('.toot_entry[sid="' + sid + '"]').remove();
+      putMessage(__("Your Toot has been deleted"));
       api.delete("statuses/" + sid, function(data) {
         if (
           $('.toot_entry[sid="' + sid + '"] .reply_button').attr("privacy") !=
@@ -2545,7 +2548,7 @@ function initStatusEditor(place) {
       /* id(str) uri(str) url(str url) account(acc) in_replay_to_id(str) in_replay_to_account_id(str) reblog(status) content(str html) created_at(string date) emojis([emoji]) replies_count(num) reblogs_count(num) favourites_count(num) reblogged(bool) favourited(bool) muted(bool) sensitive(bool) spoiler_text(str) visibility (str enum) media_attachments ([attachment]) mentions([mention]) tags([tag]) card(card) poll(poll) application(app) language(str iso6391) pinned(bool) */
 
       payload = {
-          id: "0",
+          id: getRandom(),
           url: "",
           account: {
               id: 00,

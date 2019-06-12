@@ -47,7 +47,22 @@
         !localStorage.getItem("current_instance") |
         !localStorage.getItem("current_authtoken")
       ) {
-        var __ = (function(){return function(){}})();
+        //var __ = (function(){return function(){}})();
+        var __ = (function() {
+          var _ = !!window.Pomo
+            ? window.Pomo
+            : !!window.__Pomo
+            ? window.__Pomo
+            : false;
+          var gettext_wrap = function(word, options) {
+            return _.getText(word, options);
+          };
+          gettext_wrap = !!_ ? gettext_wrap : false;
+          if (!gettext_wrap) {
+            throw new "Pomo can't be found"();
+          }
+          return gettext_wrap;
+        })();
         refreshApp();//location.href = "/login";
       } else {
         Pomo.domain = "messages";
