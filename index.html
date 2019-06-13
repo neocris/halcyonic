@@ -47,6 +47,11 @@
         !localStorage.getItem("current_instance") |
         !localStorage.getItem("current_authtoken")
       ) {
+        if(localStorage.getItem('accss_token')){
+          $(function(){
+            $('.status_main.invisible').removeClass('invisible')
+          });
+        }
         //var __ = (function(){return function(){}})();
         var __ = (function() {
           var _ = !!window.Pomo
@@ -269,7 +274,7 @@
                   type="text"
                 />
               </div>
-              <div class="status_main">
+              <div class="status_main invisible">
                 <div class="status_textarea">
                   <textarea
                     class="emoji_poss"
