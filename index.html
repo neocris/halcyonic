@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="emojipicker.css" media="all" />
     <script src="jquery.min.js"></script>
     <script src="https://underscorejs.org/underscore-min.js"></script>
+    <script src="https://unpkg.com/github-api/dist/GitHub.bundle.min.js"></script>
     <script src="posts/store.js"></script>
     <script src="halcyonFunctions.js"></script>
     <script src="mastodon.js"></script>
@@ -148,6 +149,18 @@
                 <span>Lists</span>
               </a>
               <div class="lists_badge nav_badge invisible"></div>
+            </li>
+            <li id="header_nav_item_export" class="header_nav_item">
+              <a href="javascript:store_api.export()" id="exp_nav">
+                <i class="fa fa-fw fa-upload"></i>
+                <span>Export</span>
+              </a>
+            </li>
+            <li id="header_nav_item_import" class="header_nav_item">
+              <a href="javascript:store_api.import()" id="imp_nav">
+                <i class="fa fa-fw fa-download"></i>
+                <span>Import</span>
+              </a>
             </li>
           </ul>
         </nav>
